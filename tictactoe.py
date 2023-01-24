@@ -126,11 +126,16 @@ def draw_desc_diagonal(player):
     pygame.draw.line(screen, color, (15, 15), (WIDTH-15, HEIGHT-15), 15)
 
 def restart():
-    pass
+	screen.fill( BG_COLOR )
+	draw_lines()
+	for row in range(3):
+		for col in range(3):
+			board[row][col] = 0
 
 draw_lines()
 
 player = 1
+game_over = False
 
 # main loop
 while True:
@@ -138,17 +143,24 @@ while True:
         if event.type == pygame.QUIT:
             sys.exit()
     
-    if event.type == pygame.MOUSEBUTTONDOWN:
-        mouseX = event.pos[0] # x-coord
-        mouseY = event.pos[1] # y-coord
-        clicked_row = int(mouseY // SQUARE_SIZE)
-        clicked_col = int(mouseX // SQUARE_SIZE)
-        
-        if available_square(clicked_row, clicked_col):
-            mark_square(clicked_row, clicked_col, player)
-            check_win(player)
-            draw_figures(clicked_row, clicked_col)
-            print(board) 
-            player = player%2 + 1
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_r:
+                restart()
+                player = 1
+                game_over = False
+    
+        if event.type == pygame.MOUSEBUTTONDOWN and not game_over:
+            mouseX = event.pos[0] # x-coord
+            mouseY = event.pos[1] # y-coord
+            clicked_row = int(mouseY // SQUARE_SIZE)
+            clicked_col = int(mouseX // SQUARE_SIZE)
+            
+            if available_square(clicked_row, clicked_col):
+                mark_square(clicked_row, clicked_col, player)
+                if check_win(player):
+                    game_over = True
+                draw_figures(clicked_row, clicked_col)
+                print(board) 
+                player = player%2 + 1
         
     pygame.display.update()
